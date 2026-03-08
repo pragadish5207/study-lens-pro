@@ -1,42 +1,165 @@
-#root {
-  max-width: 1280px;
+.app-container {
+  background-color: #0f0f0f;
+  color: #e0e0e0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header {
+  padding: 10px 20px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+}
+
+.message-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.msg {
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 80%;
+  line-height: 1.5;
+}
+
+.msg.bot { background: #262626; align-self: flex-start; border-bottom-left-radius: 2px; }
+.msg.user { background: #007bff; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+.file-shelf {
+  display: flex;
+  gap: 10px;
+  padding: 10px 20px;
+  overflow-x: auto;
+  background: #141414;
+  border-top: 1px solid #222;
+}
+
+.file-chip {
+  background: #333;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.input-panel {
+  padding: 20px;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.text-input {
+  flex: 1;
+  background: #2b2b2b;
+  border: 1px solid #444;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.send-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.upload-btn {
+  background: #333;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
   text-align: center;
+  font-size: 12px;
+}
+.progress-bg {
+  width: 100px;
+  height: 6px;
+  background: #333;
+  border-radius: 10px;
+  margin-top: 5px;
+  overflow: hidden;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.progress-fill {
+  height: 100%;
+  background: #00ff88; /* Glowing Green */
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px #00ff88;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.next-topic-btn {
+  background: #2ecc71; /* A nice study-green */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  margin-right: 8px;
+  transition: background 0.2s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.next-topic-btn:hover {
+  background: #27ae60; /* Darker green when you hover */
 }
 
-.card {
-  padding: 2em;
+.next-topic-btn:disabled {
+  background: #27ae60;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.level-selector {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background: #252525;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
-.read-the-docs {
-  color: #888;
+.level-selector button {
+  background: transparent;
+  border: 1px solid #444;
+  color: #bbb;
+  padding: 5px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.level-selector button:hover {
+  background: #333;
+  color: white;
+  border-color: #666;
 }
