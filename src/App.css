@@ -138,28 +138,280 @@ header {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.level-selector {
+.nav-tabs {
   display: flex;
-  justify-content: space-around;
-  padding: 10px;
-  background: #252525;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  gap: 20px;
+  margin-left: 30px;
 }
 
-.level-selector button {
+.nav-tabs button {
   background: transparent;
-  border: 1px solid #444;
-  color: #bbb;
-  padding: 5px 15px;
-  border-radius: 20px;
+  border: none;
+  color: #888;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs button.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+.nav-tabs button:hover {
+  color: #bbb;
+}
+.memory-bank-area {
+  padding: 20px;
+  height: 80%;
+  overflow-y: auto;
+}
+
+.memory-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.memory-input-group input {
+  flex: 1;
+  background: #1e1e1e;
+  border: 1px solid #444;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.memory-input-group button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.memory-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #252525;
+  border-left: 4px solid #007bff;
+  padding: 15px;
+  border-radius: 4px;
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.delete-mem-btn {
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-left: 10px;
   transition: all 0.2s ease;
 }
 
-.level-selector button:hover {
+.delete-mem-btn:hover {
+  background: #ff4d4d;
+  color: white;
+  border-color: #ff4d4d;
+}
+.exam-hall-container {
+  padding: 40px;
+  background: #1a1a1a;
+  height: 90%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.physical-paper {
+  background: white; /* Real paper look */
+  color: #333;
+  width: 100%;
+  max-width: 800px;
+  min-height: 1000px;
+  padding: 50px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 2px;
+  font-family: 'Times New Roman', serif; /* Formal exam font */
+  position: relative;
+}
+
+.exam-header {
+  text-align: center;
+  border-bottom: 2px solid #333;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+}
+
+.generate-paper-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+.selection-screen {
+  text-align: center;
+  margin-top: 50px;
+  background: #252525;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  max-width: 600px;
+}
+
+.type-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.type-buttons button {
   background: #333;
   color: white;
+  border: 2px solid #444;
+  padding: 20px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.type-buttons button:hover {
+  background: #007bff;
+  border-color: #007bff;
+  transform: translateY(-5px);
+}
+
+.back-btn {
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.back-btn:hover {
+  color: white;
   border-color: #666;
+}
+/* Question Block Styling */
+.gu-question-block {
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.main-q, .sub-q {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.q-number {
+  font-weight: bold;
+  margin-right: 15px;
+  min-width: 30px;
+}
+
+.q-content {
+  flex: 1;
+  text-align: justify;
+}
+
+.marks {
+  font-weight: bold;
+  margin-left: 20px;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* The "OR" Divider */
+.or-divider {
+  text-align: center;
+  font-weight: bold;
+  margin: 15px 0;
+  position: relative;
+}
+
+.or-divider::before, .or-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #333;
+}
+
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
+
+/* Sub-questions (5+5 or 7+3 splits) */
+.internal-option {
+  padding-left: 45px;
+}
+
+.q-separator {
+  border: 0;
+  border-top: 1px dashed #ccc;
+  margin-top: 30px;
+}
+
+.mcq-section {
+  border-top: 2px solid #333;
+  padding-top: 20px;
+}
+/* Feature 8: Print-Mode Logic */
+@media print {
+  /* 1. Hide everything on the website */
+  body * {
+    visibility: hidden;
+  }
+
+  /* 2. Show ONLY the exam paper */
+  .physical-paper, .physical-paper * {
+    visibility: visible;
+  }
+
+  /* 3. Position the paper perfectly at the top-left of the PDF */
+  .physical-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none; /* Remove the digital shadow for printing */
+    padding: 20px;
+    color: black !important;
+  }
+
+  /* 4. Hide the "Add Materials" button and tabs */
+  .upload-btn, .nav-tabs, .exam-header-controls {
+    display: none !important;
+  }
 }
