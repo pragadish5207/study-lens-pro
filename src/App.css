@@ -415,3 +415,63 @@ header {
     display: none !important;
   }
 }
+/* Feature 2: Visual File Shelf Styling */
+.file-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 20px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  min-height: 50px;
+  align-items: center;
+}
+
+.file-chip {
+  display: flex;
+  align-items: center;
+  background: #2d2d2d;
+  color: #e0e0e0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  border: 1px solid #444;
+  transition: all 0.2s ease;
+}
+
+.file-chip:hover {
+  border-color: #007bff;
+  background: #363636;
+}
+
+.file-icon {
+  margin-right: 8px;
+}
+
+.file-name {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-file-btn {
+  background: none;
+  border: none;
+  color: #888;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.remove-file-btn:hover {
+  color: #ff4d4d;
+}
+
+.no-files-msg {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}

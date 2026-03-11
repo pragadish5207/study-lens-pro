@@ -15,6 +15,15 @@ function App() {
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [memories, setMemories] = useState([]); // This stores your 'forever' notes
   const [mockPaper, setMockPaper] = useState(null); // This holds the generated Gujarat University style exam
+const STUDY_TIME_INSTRUCTIONS = `
+- You are a tutor expert and explain all the user's need about the topic or question. 
+- Explain every topic in an easy-to-understand way, as if teaching a fresher.
+- If the user asks for theory, make the explanation very hard and detailed.
+- If the user asks for practice, provide 3 types of sums: Easy, Medium, and Hard.
+- Give only one sum at a time. Do not give the next sum until the current one is verified.
+- NEVER move to the next topic or unit until the user says "Next topic" or "Next".
+- Always prioritize easy but high-weightage topics if an exam is near.
+`;
 
   useEffect(() => {
     initEngine((p) => {
@@ -29,18 +38,40 @@ function App() {
 
   const handleSend = async () => {
     if (!userInput.trim() || !isEngineReady) return;
+
+    // 1. Create the new user message
+    const userMsg = { role: 'user', text: userInput };
+    const updatedMessages = [...messages, userMsg];
     
-    const newMessages = [...messages, { role: 'user', text: userInput }];
-    setMessages(newMessages);
+    // 2. Update UI immediately
+    setMessages(updatedMessages);
     setUserInput('');
     setStatus("Thinking... 🤔");
 
+    // 3. Prepare the syllabus context from Feature 2
     const studyContext = files.map(f => f.content).join("\n");
-    const aiText = await getAIResponse(newMessages.map(m => ({ role: m.role, content: m.text })), studyContext);
     
-    setMessages(prev => [...prev, { role: 'bot', text: aiText }]);
-    setStatus("Ready");
-  };
+    // 4. Feature 3: Merge personality instructions with chat history
+    const aiMessages = [
+      { role: 'system', content: STUDY_TIME_INSTRUCTIONS }, // The rules
+      ...updatedMessages.map(m => ({ 
+        role: m.role === 'bot' ? 'assistant' : m.role, 
+        content: m.text 
+      }))
+    ];
+try {
+      // 5. Actually talk to the AI engine
+      const response = await engine.chat(aiMessages, studyContext);
+
+      // 6. Add the AI's easy-to-understand response to the chat
+      setMessages(prev => [...prev, { role: 'bot', text: response }]);
+    } catch (error) {
+      console.error("AI Error:", error);
+      setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I'm having trouble thinking. Try again?" }]);
+    } finally {
+      setStatus("Ready to Study");
+    }
+    };
 
   // ... (keep handleFileUpload from previous step)
   const handleFileUpload = async (e) => {
@@ -68,6 +99,25 @@ function App() {
           </div>
         )}
       </header>
+      {/* Feature 2: Visual File Shelf */}
+      <div className="file-shelf">
+        {files.length > 0 ? (
+          files.map((f, i) => (
+            <div key={i} className="file-chip">
+              <span className="file-icon">📄</span>
+              <span className="file-name">{f.name}</span>
+              <button 
+                className="remove-file-btn" 
+                onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+              >
+                ×
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="no-files-msg">No syllabus uploaded yet. Add a PDF to start studying.</p>
+        )}
+      </div>
 
       {/* This is where the magic happens: Switching the screens */}
       {activeTab === 'chat' ? (
