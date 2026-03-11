@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { extractTextFromPDF } from './components/PdfReader';
 import { extractTextFromImage } from './components/ImageReader';
 import { initEngine, getAIResponse } from './components/Engine';
@@ -6,163 +6,316 @@ import ExamHall from './components/ExamHall';
 import StudyChat from './components/StudyChat';
 import './App.css';
 
-function App() {
-  const [activeTab, setActiveTab] = useState('chat'); // This tracks if we are in 'chat' or 'memory' mode
-  const [status, setStatus] = useState('Loading AI Brain (Wait for 100%)...');
-  const [files, setFiles] = useState([]);
-  const [messages, setMessages] = useState([{ role: 'bot', text: 'Welcome! I am downloading my brain now. Once it reaches 100%, we can start.' }]);
-  const [userInput, setUserInput] = useState('');
-  const [isExamNear, setIsExamNear] = useState(false); // Toggle for Feature 4
-  const [isEngineReady, setIsEngineReady] = useState(false);
-  const [memories, setMemories] = useState([]); // This stores your 'forever' notes
-  const [mockPaper, setMockPaper] = useState(null); // This holds the generated Gujarat University style exam
+// Feature 3 & 4: Core Personality and Dynamic Rules
 const STUDY_TIME_INSTRUCTIONS = `
-- You are a tutor expert and explain all the user's need about the topic or question. 
-- Explain every topic in an easy-to-understand way, as if teaching a fresher.
-- If the user asks for theory, make the explanation very hard and detailed.
-- If the user asks for practice, provide 3 types of sums: Easy, Medium, and Hard.
-- Give only one sum at a time. Do not give the next sum until the current one is verified.
-- NEVER move to the next topic or unit until the user says "Next topic" or "Next".
-- Always prioritize easy but high-weightage topics if an exam is near.
+- Tutor for B.Com Sem 4. Explain like teaching a fresher.
+- Theory: Very Hard. Practice: 3 sums (Easy, Med, Hard).
+- Give one sum at a time. Verify before next.
+- NEVER move to next topic without 'Next' or 'Next Topic' command.
+- If Exam Near: Prioritize easy, high-weightage content.
 `;
 
+function App() {
+  // --- STATE MANAGEMENT ---
+  const [activeTab, setActiveTab] = useState('chat');
+  const [status, setStatus] = useState('0'); // Numeric for progress bar
+  const [isEngineReady, setIsEngineReady] = useState(false);
+  const [isExamNear, setIsExamNear] = useState(false);
+  
+  // Feature 2: Syllabus Context
+  const [files, setFiles] = useState([]);
+  
+  // Feature 1 & 3: Chat Workspace
+  const [messages, setMessages] = useState([
+    { role: 'bot', text: 'Ready to study! Upload your Banking or Taxation syllabus to start.' }
+  ]);
+  const [userInput, setUserInput] = useState('');
+
+  // Feature 5, 6 & 11: Memory, Pins, and Revision
+  const [memories, setMemories] = useState([]);
+  const [pinnedNotes, setPinnedNotes] = useState([]);
+  const [revisionSummary, setRevisionSummary] = useState('');
+
+  // Feature 7 & 8: Exam Logic
+  const [mockPaper, setMockPaper] = useState(null);
+
+  // Feature 12: Pomodoro Timer State
+  const [timer, setTimer] = useState(25 * 60);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+
+  // Feature 9: Progress Tracking (Units 1-4)
+  const [progress, setProgress] = useState({
+    unit1: 0, unit2: 0, unit3: 0, unit4: 0
+  });
+
+  // --- ENGINE INITIALIZATION ---
   useEffect(() => {
     initEngine((p) => {
-      // This line captures the percentage and updates the UI
-      setStatus(`Downloading AI: ${Math.round(p.progress * 100)}%`);
+      const pct = Math.round(p.progress * 100);
+      setStatus(pct.toString());
       if (p.progress === 1) {
         setIsEngineReady(true);
-        setStatus("Ready to Study");
+        setStatus("100");
       }
     });
   }, []);
 
+  // --- FEATURE 12: POMODORO LOGIC ---
+  useEffect(() => {
+    let interval = null;
+    if (isTimerActive && timer > 0) {
+      interval = setInterval(() => setTimer((t) => t - 1), 1000);
+    } else if (timer === 0) {
+      clearInterval(interval);
+      alert("Break time, Appu! Step away for a bit.");
+      setIsTimerActive(false);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerActive, timer]);
+
+  // --- FEATURE 1 & 3: CHAT LOGIC ---
   const handleSend = async () => {
     if (!userInput.trim() || !isEngineReady) return;
 
-    // 1. Create the new user message
     const userMsg = { role: 'user', text: userInput };
     const updatedMessages = [...messages, userMsg];
-    
-    // 2. Update UI immediately
     setMessages(updatedMessages);
     setUserInput('');
     setStatus("Thinking... 🤔");
 
-    // 3. Prepare the syllabus context from Feature 2
+    // Feature 2: Prepare Syllabus Context
     const studyContext = files.map(f => f.content).join("\n");
     
-    // Feature 4: Dynamic instructions based on Cheat Mode state
-    const currentInstructions = isExamNear 
-      ? STUDY_TIME_INSTRUCTIONS + "\n- EXAM IS NEAR! Focus ONLY on high-weightage topics and provide very easy, high-scoring practical sums."
+    // Feature 4 & 11: Dynamic Personality Injection
+    let systemPrompt = isExamNear 
+      ? STUDY_TIME_INSTRUCTIONS + "\n- EXAM MODE: Focus on high-weightage topics." 
       : STUDY_TIME_INSTRUCTIONS;
 
     const aiMessages = [
-      { role: 'system', content: currentInstructions }, 
+      { role: 'system', content: systemPrompt }, 
       ...updatedMessages.map(m => ({
         role: m.role === 'bot' ? 'assistant' : 'user',
         content: m.text
       }))
     ];
-try {
-      // 5. Actually talk to the AI engine
+
+    try {
       const response = await engine.chat(aiMessages, studyContext);
-
-      // 6. Add the AI's easy-to-understand response to the chat
       setMessages(prev => [...prev, { role: 'bot', text: response }]);
+      
+      // Feature 9: Auto-detect progress (Simple keyword check for B.Com Units)
+      if (userInput.toLowerCase().includes('done') || userInput.toLowerCase().includes('next')) {
+        updateProgress();
+      }
     } catch (error) {
-      console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I'm having trouble thinking. Try again?" }]);
+      setMessages(prev => [...prev, { role: 'bot', text: "Error! Let's try that again." }]);
     } finally {
-      setStatus("Ready to Study");
+      setStatus(isEngineReady ? "100" : "Ready");
     }
-    };
-
-  // ... (keep handleFileUpload from previous step)
-  const handleFileUpload = async (e) => {
-    const newFiles = Array.from(e.target.files);
-    setStatus("Reading files... ⏳");
-    for (let file of newFiles) {
-      let text = file.type === "application/pdf" ? await extractTextFromPDF(file) : await extractTextFromImage(file);
-      setFiles(prev => [...prev, { name: file.name, content: text }]);
-    }
-    setStatus("Ready to Study");
   };
 
+  // --- FEATURE 2 & 10: FILE & IMAGE UPLOAD ---
+  const handleFileUpload = async (e) => {
+    const newFiles = Array.from(e.target.files);
+    setStatus("Reading... ⏳");
+    
+    for (let file of newFiles) {
+      let text = "";
+      if (file.type === "application/pdf") {
+        text = await extractTextFromPDF(file); // Feature 2
+      } else if (file.type.startsWith("image/")) {
+        text = await extractTextFromImage(file); // Feature 10: Textbook Explainer
+      }
+      setFiles(prev => [...prev, { name: file.name, content: text }]);
+    }
+    setStatus("100");
+  };
+
+  // Feature 9: Progress Tracking Logic
+  const updateProgress = () => {
+    setProgress(prev => ({
+      ...prev,
+      unit1: Math.min(prev.unit1 + 25, 100) // Simple increment for demo
+    }));
+  };
+// --- RENDER APPLICATION ---
   return (
     <div className="app-container">
-     <header>
-        <h1>Study-Lens Pro 📚</h1>
-        <div className="nav-tabs">
-          <button 
-            className={`cheat-mode-btn ${isExamNear ? 'active' : ''}`}
-            onClick={() => setIsExamNear(!isExamNear)}
-          >
-            {isExamNear ? "🔥 Cheat Mode ON" : "⚖️ Normal Mode"}
-          </button>
-          <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>Study Chat</button>
-          <button className={activeTab === 'memory' ? 'active' : ''} onClick={() => setActiveTab('memory')}>Memory Bank 🧠</button>
-          <button className={activeTab === 'exam' ? 'active' : ''} onClick={() => setActiveTab('exam')}>Exam Hall 🏛️</button>
+      {/* --- TOP NAVIGATION & HEADER --- */}
+      <header className="main-header">
+        <div className="logo-section">
+          <h1>Study-Lens Pro 📚</h1>
+          
+          {/* Feature 12: Pomodoro Timer UI */}
+          <div className="pomodoro-timer">
+            <span className="timer-display">
+              ⏱️ {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+            </span>
+            <button 
+              className={`pomodoro-btn ${isTimerActive ? 'active' : ''}`}
+              onClick={() => setIsTimerActive(!isTimerActive)}
+            >
+              {isTimerActive ? 'Pause' : 'Start Focus'}
+            </button>
+          </div>
         </div>
+
+        {/* AI Loading Bar / Engine Status */}
         {!isEngineReady && (
-          <div className="progress-bg">
-            <div className="progress-fill" style={{ width: `${status.match(/\d+/)?. [0] || 0}%` }}></div>
+          <div className="loading-container">
+            <span className="pct-text">{status}% Ready</span>
+            <div className="progress-bar">
+              <div className="fill" style={{width: `${status}%`}}></div>
+            </div>
           </div>
         )}
+
+        {/* Main Navigation Tabs */}
+        <nav className="nav-pills">
+          <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>Study Chat</button>
+          <button className={activeTab === 'memory' ? 'active' : ''} onClick={() => setActiveTab('memory')}>Memory 🧠</button>
+          <button className={activeTab === 'exam' ? 'active' : ''} onClick={() => setActiveTab('exam')}>Exam Hall 🏛️</button>
+          <button className={activeTab === 'progress' ? 'active' : ''} onClick={() => setActiveTab('progress')}>Syllabus Tracker 📊</button>
+        </nav>
       </header>
-      {/* Feature 2: Visual File Shelf */}
-      <div className="file-shelf">
-        {files.length > 0 ? (
-          files.map((f, i) => (
-            <div key={i} className="file-chip">
-              <span className="file-icon">📄</span>
-              <span className="file-name">{f.name}</span>
+
+      <section className="workspace">
+        {/* --- FEATURE 1 & 2: CHAT AND FILE SHELF --- */}
+        {activeTab === 'chat' && (
+          <div className="chat-wrapper">
+            {/* Feature 2: Visual File Shelf */}
+            <div className="file-shelf">
+              {files.length > 0 ? (
+                files.map((f, i) => (
+                  <div key={i} className="file-chip">
+                    <span className="file-icon">📄</span>
+                    <span className="file-name">{f.name}</span>
+                    <button 
+                      className="remove-file-btn" 
+                      onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+                    >×</button>
+                  </div>
+                ))
+              ) : (
+                <p className="no-files-msg">Upload Banking or Taxation II syllabus to begin.</p>
+              )}
+            </div>
+
+            {/* Main Study Chat Component */}
+            <StudyChat 
+              messages={messages} 
+              userInput={userInput} 
+              setUserInput={setUserInput} 
+              handleSend={handleSend} 
+              isEngineReady={isEngineReady} 
+            />
+
+            {/* Feature 4 & 10: Gemini-Style Bottom Controls */}
+            <div className="bottom-controls">
               <button 
-                className="remove-file-btn" 
-                onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+                className={`mode-pill ${isExamNear ? 'exam' : ''}`} 
+                onClick={() => setIsExamNear(!isExamNear)}
               >
-                ×
+                {isExamNear ? "🔥 Cheat Mode" : "⚖️ Normal Mode"}
+              </button>
+              <label className="upload-pill">
+                + Add PDF/Image
+                <input type="file" accept=".pdf,image/*" multiple onChange={handleFileUpload} style={{display:'none'}}/>
+              </label>
+              {/* Feature 11: Quick Revision Trigger */}
+              <button 
+                className="quick-revision-btn" 
+                onClick={() => { setUserInput("Give me a 1-page quick revision of the current topic."); handleSend(); }}
+                disabled={!isEngineReady}
+              >
+                ⚡ Quick Revision
               </button>
             </div>
-          ))
-        ) : (
-          <p className="no-files-msg">No syllabus uploaded yet. Add a PDF to start studying.</p>
+          </div>
         )}
-      </div>
 
-      {/* This is where the magic happens: Switching the screens */}
-      {activeTab === 'chat' ? (
-        <StudyChat 
-          messages={messages} 
-          userInput={userInput} 
-          setUserInput={setUserInput} 
-          handleSend={handleSend} 
-          isEngineReady={isEngineReady} 
-        />
-      ) : activeTab === 'memory' ? (
-        <div className="memory-bank-area">
-          <h2>Memory Bank 🧠</h2>
-          <div className="memory-input-group">
-            <input type="text" placeholder="Type a formula..." id="mem-input" />
-            <button onClick={() => {
-              const val = document.getElementById('mem-input').value;
-              if(val) { setMemories([...memories, val]); document.getElementById('mem-input').value = ''; }
-            }}>Save to Memory</button>
-          </div>
-          <div className="memory-list">
-            {memories.map((m, i) => (
-              <div key={i} className="memory-item">
-                <span>📌 {m}</span>
-                <button className="delete-mem-btn" onClick={() => setMemories(memories.filter((_, idx) => idx !== i))}>Remove</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <ExamHall mockPaper={mockPaper} setMockPaper={setMockPaper} isEngineReady={isEngineReady} />
-      )}
+{/* --- FEATURE 5 & 6: MEMORY BANK & PINNED NOTES --- */}
+        {activeTab === 'memory' && (
+          <div className="memory-bank-area">
+            <div className="memory-header">
+              <h2>🧠 Memory Bank & Pinned Notes</h2>
+              <p>Save complex formulas for Industrial Statistics here.</p>
+            </div>
+            
+            <div className="memory-input-group">
+              <input type="text" placeholder="Type a formula, rule, or shortcut..." id="mem-input" />
+              <button onClick={() => {
+                const val = document.getElementById('mem-input').value;
+                if(val) { 
+                  // Default new memories to unpinned
+                  setMemories([...memories, { text: val, isPinned: false }]); 
+                  document.getElementById('mem-input').value = ''; 
+                }
+              }}>Save to Memory</button>
+            </div>
 
-      <label className="upload-btn">+ Add Materials<input type="file" multiple onChange={handleFileUpload} style={{display: 'none'}}/></label>
+            {/* Feature 6: High-Priority Pinned Notes */}
+            <div className="pinned-section">
+              <h3 className="section-title">📌 Pinned for Internals</h3>
+              {memories.filter(m => m.isPinned).length === 0 && <p className="empty-msg">No pinned notes yet.</p>}
+              {memories.filter(m => m.isPinned).map((m, i) => (
+                <div key={`pin-${i}`} className="memory-item pinned">
+                  <span>{m.text}</span>
+                  <div className="mem-actions">
+                    <button onClick={() => setMemories(memories.map(item => item.text === m.text ? { ...item, isPinned: false } : item))}>Unpin</button>
+                    <button className="del-btn" onClick={() => setMemories(memories.filter(item => item.text !== m.text))}>❌</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Feature 5: Standard Memory List */}
+            <div className="standard-section">
+              <h3 className="section-title">🧠 General Memories</h3>
+              {memories.filter(m => !m.isPinned).map((m, i) => (
+                <div key={`mem-${i}`} className="memory-item">
+                  <span>{m.text}</span>
+                  <div className="mem-actions">
+                    <button onClick={() => setMemories(memories.map(item => item.text === m.text ? { ...item, isPinned: true } : item))}>Pin 📌</button>
+                    <button className="del-btn" onClick={() => setMemories(memories.filter(item => item.text !== m.text))}>❌</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- FEATURE 7 & 8: GU PAPER MIMIC & PDF EXPORT --- */}
+        {activeTab === 'exam' && (
+          // Passing 'files' makes it dynamic based on your uploads!
+          <ExamHall 
+            mockPaper={mockPaper} 
+            setMockPaper={setMockPaper} 
+            isEngineReady={isEngineReady} 
+            files={files} 
+          />
+        )}
+
+        {/* --- FEATURE 9: SYLLABUS PROGRESS TRACKER --- */}
+        {activeTab === 'progress' && (
+          <div className="progress-tracker-area">
+            <h2>📊 Semester 4 Progress</h2>
+            <p>Your completion stats based on study sessions.</p>
+            <div className="unit-grid">
+              {['unit1', 'unit2', 'unit3', 'unit4'].map((unit, idx) => (
+                <div key={idx} className="unit-card">
+                  <h3>Unit {idx + 1}</h3>
+                  <div className="progress-bar track-bar">
+                    <div className="fill" style={{width: `${progress[unit]}%`}}></div>
+                  </div>
+                  <p className="pct-label">{progress[unit]}% Mastered</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+</section>
     </div>
   );
 }
