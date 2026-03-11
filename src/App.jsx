@@ -12,6 +12,7 @@ function App() {
   const [files, setFiles] = useState([]);
   const [messages, setMessages] = useState([{ role: 'bot', text: 'Welcome! I am downloading my brain now. Once it reaches 100%, we can start.' }]);
   const [userInput, setUserInput] = useState('');
+  const [isExamNear, setIsExamNear] = useState(false); // Toggle for Feature 4
   const [isEngineReady, setIsEngineReady] = useState(false);
   const [memories, setMemories] = useState([]); // This stores your 'forever' notes
   const [mockPaper, setMockPaper] = useState(null); // This holds the generated Gujarat University style exam
@@ -51,12 +52,16 @@ const STUDY_TIME_INSTRUCTIONS = `
     // 3. Prepare the syllabus context from Feature 2
     const studyContext = files.map(f => f.content).join("\n");
     
-    // 4. Feature 3: Merge personality instructions with chat history
+    // Feature 4: Dynamic instructions based on Cheat Mode state
+    const currentInstructions = isExamNear 
+      ? STUDY_TIME_INSTRUCTIONS + "\n- EXAM IS NEAR! Focus ONLY on high-weightage topics and provide very easy, high-scoring practical sums."
+      : STUDY_TIME_INSTRUCTIONS;
+
     const aiMessages = [
-      { role: 'system', content: STUDY_TIME_INSTRUCTIONS }, // The rules
-      ...updatedMessages.map(m => ({ 
-        role: m.role === 'bot' ? 'assistant' : m.role, 
-        content: m.text 
+      { role: 'system', content: currentInstructions }, 
+      ...updatedMessages.map(m => ({
+        role: m.role === 'bot' ? 'assistant' : 'user',
+        content: m.text
       }))
     ];
 try {
@@ -89,6 +94,12 @@ try {
      <header>
         <h1>Study-Lens Pro 📚</h1>
         <div className="nav-tabs">
+          <button 
+            className={`cheat-mode-btn ${isExamNear ? 'active' : ''}`}
+            onClick={() => setIsExamNear(!isExamNear)}
+          >
+            {isExamNear ? "🔥 Cheat Mode ON" : "⚖️ Normal Mode"}
+          </button>
           <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>Study Chat</button>
           <button className={activeTab === 'memory' ? 'active' : ''} onClick={() => setActiveTab('memory')}>Memory Bank 🧠</button>
           <button className={activeTab === 'exam' ? 'active' : ''} onClick={() => setActiveTab('exam')}>Exam Hall 🏛️</button>
@@ -151,7 +162,7 @@ try {
         <ExamHall mockPaper={mockPaper} setMockPaper={setMockPaper} isEngineReady={isEngineReady} />
       )}
 
-      <label className="upload-btn">+ Add Materials<input type="file" multiple onChange={handleFileChange} style={{display: 'none'}}/></label>
+      <label className="upload-btn">+ Add Materials<input type="file" multiple onChange={handleFileUpload} style={{display: 'none'}}/></label>
     </div>
   );
 }

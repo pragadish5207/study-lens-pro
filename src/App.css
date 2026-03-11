@@ -475,3 +475,32 @@ header {
   font-size: 13px;
   font-style: italic;
 }
+/* Feature 4: Cheat Mode Button Styling */
+.cheat-mode-btn {
+  background: #333;
+  color: #888;
+  border: 1px solid #444;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  margin-right: auto; /* Pushes other tabs to the right */
+}
+
+.cheat-mode-btn:hover {
+  border-color: #666;
+  color: #ccc;
+}
+
+.cheat-mode-btn.active {
+  background: linear-gradient(45deg, #ff4e00, #ec9f05);
+  border-color: #ff4e00;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 78, 0, 0.4);
+}
+
+.cheat-mode-btn.active:hover {
+  transform: scale(1.05);
+}
