@@ -1,29 +1,32 @@
 /* =========================================================
-   PHASE 3, PART 1: GLOBAL VARIABLES & MAIN LAYOUT
+   STUDY-LENS PRO: PREMIUM FUTURISTIC UI
+   PART 1: GLOBAL VARIABLES & MAIN LAYOUT
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Colors matching the sleek, dark UI */
-  --bg-primary: #131314;       /* Main chat area background */
-  --bg-secondary: #1e1f20;     /* Sidebar and modal background */
-  --bg-hover: #333537;         /* Button hover states */
-  --bg-input: #1e1f20;         /* Chat input background */
+  /* THE PREMIUM FUTURISTIC PALETTE */
+  --bg-primary: #0a0a0e;       /* Deep, near-black space background */
+  --bg-secondary: #12121a;     /* Slightly lighter panel background */
+  --bg-hover: #1f1f2e;         /* Hover state for buttons/cards */
+  --bg-input: #15151e;         /* Dark input field */
   
-  --text-primary: #e3e3e3;     /* Main text */
-  --text-secondary: #c4c7c5;   /* Sub-text, placeholders */
-  --text-accent: #a8c7fa;      /* Blue accent text */
+  --text-primary: #f0f0f5;     /* Crisp white text */
+  --text-secondary: #8c8c9e;   /* Muted gray-blue subtext */
+  --text-accent: #00f0ff;      /* Electric Cyan text accent */
   
-  --border-color: #333537;     /* Dividers and borders */
+  --border-color: #2a2a3c;     /* Subtle neon-tinged borders */
   
-  --accent-color: #a8c7fa;     /* Primary buttons, icons */
-  --danger-color: #f28b82;     /* Delete, close actions */
-  --success-color: #81c995;    /* Online indicator */
-  --gradient-primary: linear-gradient(90deg, #4b90ff, #ff5546); /* Greeting gradient */
+  --accent-color: #00f0ff;     /* Primary neon cyan */
+  --accent-alt: #b026ff;       /* Secondary electric purple */
+  --danger-color: #ff3366;     /* Neon pink/red for danger */
+  --success-color: #00ff9d;    /* Bright emerald green */
+  
+  /* The signature Study-Lens Pro gradient */
+  --gradient-primary: linear-gradient(135deg, var(--accent-color), var(--accent-alt)); 
   
   --sidebar-width: 280px;
-  
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -37,21 +40,34 @@ body {
   font-family: var(--font-family);
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  overflow: hidden; /* Prevent body scroll, handle scrolling in child containers */
+  overflow: hidden; 
   height: 100vh;
   width: 100vw;
 }
 
 /* --- MAIN APP WRAPPER --- */
-.app-container {
+/* The class we added in App.jsx to trigger the new theme */
+.premium-theme {
   display: flex;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
   background-color: var(--bg-primary);
+  /* Adds a very subtle, premium glow to the whole app */
+  box-shadow: inset 0 0 100px rgba(0, 240, 255, 0.02);
 }
 
-/* --- MAIN WORKSPACE (Chat + Controls) --- */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+/* =========================================================
+   PART 2: MAIN WORKSPACE & PREMIUM HEADER (TOGGLE SWITCH)
+   ========================================================= */
+
+/* --- MAIN WORKSPACE --- */
 .main-content {
   flex: 1;
   display: flex;
@@ -62,7 +78,6 @@ body {
   background-color: var(--bg-primary);
 }
 
-/* Handle layout when sidebar is open vs closed */
 .main-content.sidebar-open {
   width: calc(100vw - var(--sidebar-width));
 }
@@ -71,16 +86,26 @@ body {
   width: 100vw;
 }
 
-/* --- MOBILE / TOP HEADER (Visible when sidebar is closed) --- */
-.mobile-header {
+/* --- THE NEW PREMIUM HEADER (From App.jsx) --- */
+.app-header {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  height: 60px;
+  justify-content: space-between; /* Pushes title left, toggle right */
+  padding: 12px 24px;
+  height: 65px;
   flex-shrink: 0;
+  background-color: rgba(18, 18, 26, 0.8); /* Semi-transparent */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  border-bottom: 1px solid var(--border-color);
+  z-index: 10;
 }
 
-.mobile-header .menu-btn {
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-left .menu-btn {
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -91,36 +116,106 @@ body {
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  transition: background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
 }
 
-.mobile-header .menu-btn:hover {
+.header-left .menu-btn:hover {
   background-color: var(--bg-hover);
+  color: var(--accent-color); /* Cyan hover */
 }
 
-.mobile-title {
-  font-size: 1.1rem;
-  font-weight: 500;
+.premium-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+/* --- HYBRID ENGINE TOGGLE SWITCH --- */
+.engine-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-hover);
+  padding: 6px 12px;
+  border-radius: 30px;
+  border: 1px solid var(--border-color);
+}
+
+.mode-label {
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
-/* General Scrollbar styling for a modern look */
+/* The actual switch box */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider track */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #3a3a4a; /* Offline track color */
+  transition: .4s;
+  border-radius: 24px;
+}
+
+/* The slider circle */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* When checked (Online Mode) */
+input:checked + .slider {
+  background-color: var(--accent-color); /* Cyan online track */
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* --- SCROLLBARS --- */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #444;
+  background: var(--border-color);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--text-secondary);
 }
 /* =========================================================
-   PHASE 3, PART 2: SIDEBAR (TOP & MIDDLE)
+   PART 3: THE PRO SIDEBAR (TOP & HISTORY)
    ========================================================= */
 
 /* --- SIDEBAR CONTAINER --- */
@@ -132,6 +227,8 @@ body {
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
   overflow: hidden;
+  border-right: 1px solid var(--border-color); /* Distinct separation from chat */
+  box-shadow: 5px 0 20px rgba(0,0,0,0.5); /* Deep shadow for depth */
 }
 
 .sidebar.open {
@@ -140,14 +237,16 @@ body {
 
 .sidebar.closed {
   width: 0; 
+  border-right: none;
 }
 
 /* --- TOP SECTION (Hamburger & Logo) --- */
 .sidebar-top {
   display: flex;
   align-items: center;
-  height: 60px;
+  height: 65px; /* Matches the new app-header height perfectly */
   padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
 }
 
 .sidebar-top .menu-btn {
@@ -156,56 +255,61 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   padding: 8px;
-  border-radius: 50%;
+  border-radius: 8px; /* Sharper edges */
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .sidebar-top .menu-btn:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(0, 240, 255, 0.1); /* Very slight cyan hover tint */
+  color: var(--accent-color);
 }
 
 .brand-logo {
   margin-left: 12px;
   font-size: 1.2rem;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
-/* --- NEW CHAT BUTTON --- */
+/* --- NEW CHAT BUTTON (CYBERPUNK STYLE) --- */
 .new-chat-wrapper {
-  padding: 10px 16px;
+  padding: 16px;
 }
 
 .new-chat-btn {
   display: flex;
   align-items: center;
-  background-color: var(--bg-hover);
-  color: var(--text-secondary);
-  border: none;
-  border-radius: 50px; /* Gemini-style pill shape */
-  padding: 10px 14px;
+  background-color: rgba(0, 240, 255, 0.05); /* Very subtle cyan bg */
+  color: var(--text-primary);
+  border: 1px solid rgba(0, 240, 255, 0.3); /* Glowing border */
+  border-radius: 8px; /* Pro/Tech sharp look, completely removing the pill shape */
+  padding: 12px 16px;
   cursor: pointer;
   font-size: 0.95rem;
-  font-weight: 500;
-  width: fit-content;
-  transition: background-color 0.2s, color 0.2s;
+  font-weight: 600;
+  width: 100%; /* Full width looks better in tech UIs */
+  transition: all 0.2s;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.05);
 }
 
 .new-chat-btn:hover {
-  background-color: #444746; /* Slightly lighter on hover */
-  color: var(--text-primary);
+  background-color: rgba(0, 240, 255, 0.15); 
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  transform: translateY(-1px); /* Slight lift effect */
 }
 
 .new-chat-btn svg {
   margin-right: 12px;
-}
-
-.new-chat-text {
-  white-space: nowrap;
+  color: var(--accent-color);
 }
 
 /* --- MIDDLE SECTION (CHAT HISTORY) --- */
@@ -221,56 +325,55 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase; /* Techy all-caps look */
+  letter-spacing: 1px;
   padding: 8px 12px;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s;
-  margin-bottom: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  margin-bottom: 8px;
 }
 
 .recent-header:hover {
-  background-color: var(--bg-hover);
-}
-
-.chevron {
-  transition: transform 0.3s ease;
-}
-
-.chevron.expanded {
-  transform: rotate(180deg);
+  color: var(--text-primary);
+  background-color: rgba(255,255,255,0.03);
 }
 
 .chat-history-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .history-item {
   display: flex;
   align-items: center;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
+  border-left: 2px solid transparent; /* Ready for hover state */
   color: var(--text-secondary);
   padding: 10px 12px;
-  border-radius: 50px;
+  border-radius: 6px; /* Boxy tech look */
   cursor: pointer;
   text-align: left;
   font-size: 0.9rem;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s;
 }
 
+/* The cool cyber hover effect for history items */
 .history-item:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(255,255,255,0.03);
   color: var(--text-primary);
+  border-left: 2px solid var(--accent-color); /* Cyan glowing line on the left */
 }
 
 .history-item svg {
   margin-right: 12px;
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .history-title {
@@ -286,41 +389,49 @@ body {
   font-style: italic;
 }
 /* =========================================================
-   PHASE 3, PART 3: SIDEBAR BOTTOM & CHAT WORKSPACE (START)
+   PART 4: SIDEBAR BOTTOM & CHAT WORKSPACE (START)
    ========================================================= */
 
 /* --- SIDEBAR BOTTOM SECTION (Settings & Profile) --- */
 .sidebar-bottom {
-  padding: 12px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: auto; /* Pushes it to the bottom */
+  gap: 8px;
+  margin-top: auto; 
   border-top: 1px solid var(--border-color);
+  background-color: rgba(0,0,0,0.2); /* Slight darkening at the bottom */
 }
 
 .bottom-item-btn {
   display: flex;
   align-items: center;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-secondary);
   cursor: pointer;
   padding: 10px 12px;
-  border-radius: 50px; /* Matching the pill shape */
+  border-radius: 8px; /* Pro/Tech sharp edges */
   font-size: 0.9rem;
   font-weight: 500;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s;
 }
 
 .bottom-item-btn:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(255,255,255,0.03);
   color: var(--text-primary);
+  border-color: rgba(255,255,255,0.05); /* Subtle outline on hover */
 }
 
 .bottom-item-btn svg {
   margin-right: 12px;
   flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.bottom-item-btn:hover svg {
+  color: var(--text-primary);
 }
 
 .bottom-item-text {
@@ -331,12 +442,15 @@ body {
 .profile-section {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.02);
+  margin-top: 4px;
 }
 
 .status-indicator {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   margin-right: 12px;
   flex-shrink: 0;
@@ -344,14 +458,15 @@ body {
 
 .status-indicator.online {
   background-color: var(--success-color);
-  box-shadow: 0 0 8px rgba(129, 201, 149, 0.4);
+  box-shadow: 0 0 10px var(--success-color); /* Neon glow for online status */
 }
 
 .profile-text {
   color: var(--text-secondary);
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
 /* =========================================================
@@ -371,11 +486,11 @@ body {
 
 .chat-container {
   width: 100%;
-  max-width: 800px; /* Limits width for readability, like Gemini */
+  max-width: 850px; /* Slightly wider for a pro feel */
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  justify-content: flex-end; /* Pushes messages to bottom initially */
+  justify-content: flex-end; 
 }
 
 /* --- EMPTY STATE (Greeting) --- */
@@ -383,33 +498,43 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center; /* Centered layout looks more like a dashboard */
+  text-align: center;
   margin: auto 0;
   padding: 40px 20px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.premium-logo-placeholder {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.4)); /* Glowing target/logo */
 }
 
 .greeting-text {
-  font-size: 3.5rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  letter-spacing: -1px;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
 }
 
-.gradient-text {
+.premium-text {
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.2); /* Holographic text glow */
 }
 
 .sub-greeting {
-  font-size: 2rem;
-  font-weight: 500;
-  color: #444746; /* Subtle dark gray */
-  line-height: 1.2;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
 }
 /* =========================================================
-   PHASE 3, PART 4: CHAT BUBBLES & ANIMATIONS
+   PART 5: CHAT BUBBLES & NEON ANIMATIONS
    ========================================================= */
 
 .messages-list {
@@ -424,46 +549,51 @@ body {
   display: flex;
   align-items: flex-start;
   max-width: 100%;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.4s ease-out;
 }
 
-/* User Message Styling */
+/* --- USER MESSAGE (Holographic Panel) --- */
 .user-message {
   justify-content: flex-end;
 }
 
 .user-message .message-content {
-  background-color: var(--bg-hover); /* Dark gray bubble */
+  background: rgba(0, 240, 255, 0.08); /* Very faint cyan background */
   color: var(--text-primary);
-  padding: 12px 18px;
-  border-radius: 20px 20px 4px 20px;
+  padding: 14px 20px;
+  border: 1px solid rgba(0, 240, 255, 0.2); /* Tech-style thin border */
+  border-radius: 12px 12px 2px 12px; /* Sharp bottom-right corner like a chat box */
   max-width: 80%;
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.05); /* Soft background glow */
 }
 
-/* AI Message Styling */
+/* --- AI MESSAGE (System Readout) --- */
 .ai-message {
   justify-content: flex-start;
 }
 
-.ai-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--gradient-primary); /* Cool gradient avatar */
+/* The new premium Lens Avatar */
+.premium-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px; /* Techy square look instead of a standard circle */
+  background: rgba(176, 38, 255, 0.1); /* Deep purple tint */
+  border: 1px solid var(--accent-alt); /* Purple border */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
+  margin-right: 18px;
   flex-shrink: 0;
-  color: white;
+  color: var(--accent-color); /* Cyan icon inside a purple box */
+  box-shadow: 0 0 12px rgba(176, 38, 255, 0.3); /* Purple outer glow */
 }
 
 .ai-message .message-content {
   color: var(--text-primary);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.7;
   max-width: 85%;
   padding-top: 6px; 
 }
@@ -474,34 +604,37 @@ body {
   align-items: center;
   gap: 12px;
   padding: 15px 0;
-  color: var(--text-secondary);
+  color: var(--text-accent); /* System text is electric cyan */
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   margin-top: 10px;
+  text-transform: uppercase; /* Looks like a computer terminal */
 }
 
-/* Loading Dot (Spinning circle) */
+/* Loading Dot (Tech Spinner) */
 .status-dot {
   width: 16px;
   height: 16px;
-  border: 3px solid var(--border-color);
+  border: 2px solid rgba(0, 240, 255, 0.2);
   border-top-color: var(--accent-color);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
-/* Thinking Pulse (Glowing dot) */
+/* Thinking Pulse (Glowing node) */
 .status-pulse {
   width: 12px;
   height: 12px;
-  background-color: var(--accent-color);
+  background-color: var(--accent-alt);
   border-radius: 50%;
-  animation: pulse 1.5s infinite ease-in-out;
+  box-shadow: 0 0 10px var(--accent-alt);
+  animation: pulse 1.2s infinite ease-in-out;
 }
 
 /* --- KEYFRAME ANIMATIONS --- */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -510,18 +643,18 @@ body {
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.8); opacity: 0.5; }
+  0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 5px var(--accent-alt); }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px var(--accent-alt); }
+  100% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 5px var(--accent-alt); }
 }
 /* =========================================================
-   PHASE 3, PART 5: BOTTOM CONTROLS & INPUT AREA
+   PART 6: BOTTOM CONTROLS & NEON INPUT AREA
    ========================================================= */
 
 /* --- BOTTOM CONTROLS WRAPPER --- */
 .bottom-controls-wrapper {
   width: 100%;
-  max-width: 840px; /* Slightly wider than chat for perfect alignment */
+  max-width: 880px; /* Slightly wider to match the new chat width */
   margin: 0 auto;
   padding: 0 20px 20px 20px;
   display: flex;
@@ -538,16 +671,18 @@ body {
   padding: 0 10px;
 }
 
+/* File attachments look like glowing data chips */
 .mini-file-chip {
-  background-color: var(--bg-hover);
+  background-color: rgba(176, 38, 255, 0.1); /* Deep purple tint */
   color: var(--text-primary);
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 6px; /* Techy sharp look */
   font-size: 0.85rem;
   display: flex;
   align-items: center;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border: 1px solid var(--accent-alt); /* Purple border */
+  box-shadow: 0 0 10px rgba(176, 38, 255, 0.2); /* Outer purple glow */
+  letter-spacing: 0.5px;
 }
 
 /* --- MAIN INPUT CONTAINER --- */
@@ -556,15 +691,19 @@ body {
   display: flex;
   align-items: flex-end;
   background-color: var(--bg-input);
-  border-radius: 24px;
-  padding: 10px 16px;
-  min-height: 56px;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  border-radius: 12px; /* Sharper box, completely removing the Gemini pill shape */
+  padding: 12px 16px;
+  min-height: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Deep shadow */
 }
 
+/* The neon focus effect when you click inside to type */
 .input-container:focus-within {
-  background-color: #2a2b2e; /* Slightly lighter on focus like Gemini */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #1a1a24;
+  border-color: rgba(0, 240, 255, 0.4); /* Cyan glow border */
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .chat-input {
@@ -584,37 +723,52 @@ body {
 
 .chat-input::placeholder {
   color: var(--text-secondary);
+  opacity: 0.7;
 }
 
+/* Custom scrollbar just for the input box */
+.chat-input::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-input::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
+}
+
+/* --- SEND BUTTON --- */
 .send-btn {
   background: transparent;
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
+  padding: 10px;
+  border-radius: 8px; /* Square button */
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: 12px;
-  transition: color 0.2s, background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
+/* Active Send Button Glow-Up */
 .send-btn:not(:disabled) {
-  color: var(--text-primary);
-  background-color: var(--bg-hover);
+  color: var(--bg-primary); /* Dark icon */
+  background-color: var(--accent-color); /* Solid bright cyan */
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
 }
 
 .send-btn:not(:disabled):hover {
-  background-color: #444746;
+  background-color: #33ffff; /* Lighter cyan */
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+  transform: scale(1.05); /* Pops out slightly */
 }
 
 .send-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
-/* --- ACTION ROW (Tools & Modes beneath input) --- */
+/* --- ACTION ROW (Tools beneath input) --- */
 .action-row {
   display: flex;
   justify-content: space-between;
@@ -629,26 +783,29 @@ body {
 
 .action-icon-btn {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  font-weight: 500;
-  transition: color 0.2s;
-  padding: 4px;
+  font-weight: 600;
+  transition: all 0.2s;
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
 .action-icon-btn:hover {
   color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .action-icon-btn svg {
   margin-right: 8px;
 }
 /* =========================================================
-   PHASE 3, PART 6: MODE SELECTOR DROPDOWN
+   PART 7: MODE SELECTOR DROPDOWN (NEON UI)
    ========================================================= */
 
 .relative {
@@ -659,98 +816,111 @@ body {
 .mode-selector-btn {
   display: flex;
   align-items: center;
-  background-color: var(--bg-hover);
+  background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px; /* Techy sharp corners */
+  padding: 8px 16px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .mode-selector-btn:hover {
-  background-color: #444746;
-  border-color: #555;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .mode-selector-btn svg {
-  margin-left: 8px;
+  margin-left: 10px;
 }
 
-/* Specific Mode Button Colors */
+/* Specific Mode Button Colors (Neon glowing states) */
 .mode-selector-btn.exam {
-  color: #ffb74d; /* Subtle orange/gold for Exam */
-  border-color: rgba(255, 183, 77, 0.4);
+  color: #ffaa00; /* Neon Gold */
+  border-color: rgba(255, 170, 0, 0.4);
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.1);
 }
 
 .mode-selector-btn.revision {
-  color: #64b5f6; /* Subtle blue for Revision */
-  border-color: rgba(100, 181, 246, 0.4);
+  color: var(--accent-color); /* Neon Cyan */
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
 }
 
 .mode-selector-btn.cheat {
-  color: #f28b82; /* Subtle red for Cheat Mode */
-  border-color: rgba(242, 139, 130, 0.4);
-  box-shadow: 0 0 10px rgba(242, 139, 130, 0.1);
+  color: var(--danger-color); /* Neon Pink/Red */
+  border-color: rgba(255, 51, 102, 0.4);
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
 }
 
 /* --- DROPDOWN MENU --- */
 .mode-dropdown-menu {
   position: absolute;
-  bottom: calc(100% + 12px); /* Pops up above the button */
+  bottom: calc(100% + 16px); /* Pops up above the button */
   right: 0;
-  background-color: var(--bg-secondary);
+  background-color: rgba(18, 18, 26, 0.95); /* Deep dark background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px; /* Sharp corners */
   padding: 8px;
-  width: 280px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  width: 300px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.05);
   z-index: 100;
   animation: popUp 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes popUp {
-  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  from { opacity: 0; transform: translateY(15px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .mode-option {
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-bottom: 2px;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
 }
 
 .mode-option:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Active State for Dropdown Options */
 .mode-option.active {
-  background-color: rgba(168, 199, 250, 0.08); /* Subtle accent background */
-  border-left: 3px solid var(--accent-color);
-  padding-left: 9px; /* Adjust for the border width */
+  background-color: rgba(0, 240, 255, 0.08); /* Faint cyan bg */
+  border-left: 3px solid var(--accent-color); /* Thick cyan glowing border */
+  border-top: 1px solid rgba(0, 240, 255, 0.2);
+  border-right: 1px solid rgba(0, 240, 255, 0.2);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding-left: 11px; /* Adjust for the border width */
+  box-shadow: inset 20px 0 20px -20px rgba(0, 240, 255, 0.3);
 }
 
 .mode-option-title {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
 .mode-option-desc {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  line-height: 1.3;
+  line-height: 1.4;
 }
 /* =========================================================
-   PHASE 3, PART 7: OVERLAYS & MODALS (Settings / Tools)
+   PART 8: OVERLAYS & MODALS (Settings / Tools)
    ========================================================= */
 
-/* --- GLOBAL OVERLAY (Dark transparent background) --- */
+/* --- GLOBAL OVERLAY (Deep blurred background) --- */
 .settings-overlay,
 .tools-overlay {
   position: fixed;
@@ -758,39 +928,39 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent */
-  backdrop-filter: blur(4px); /* Gemini-style background blur */
+  background-color: rgba(0, 0, 0, 0.75); /* Darker for pro feel */
+  backdrop-filter: blur(8px); /* Strong frosted glass */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeInOverlay 0.2s ease-out;
+  animation: fadeInOverlay 0.3s ease-out;
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
 }
 
-/* --- MODAL CONTAINERS --- */
+/* --- MODAL CONTAINERS (Holographic Panels) --- */
 .settings-modal,
 .tools-modal {
   background-color: var(--bg-secondary);
   width: 90%;
-  max-width: 850px;
-  height: 80vh;
-  max-height: 700px;
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
+  max-width: 900px; /* Slightly wider */
+  height: 85vh;
+  max-height: 750px;
+  border-radius: 12px; /* Sharp, sleek corners */
+  border: 1px solid rgba(0, 240, 255, 0.2); /* Cyan tinted border */
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
-  animation: slideUpModal 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.05);
+  animation: slideUpModal 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes slideUpModal {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -800,289 +970,365 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-secondary);
+  padding: 20px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .settings-header h2,
 .tools-header h2 {
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase; /* Terminal style */
 }
 
+/* The Close "X" Button */
 .close-btn {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-secondary);
   cursor: pointer;
   padding: 8px;
-  border-radius: 50%;
+  border-radius: 6px; /* Square button */
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s;
 }
 
 .close-btn:hover {
-  background-color: var(--bg-hover);
-  color: var(--danger-color); /* Turns red on hover to indicate close */
+  background-color: rgba(255, 51, 102, 0.1); /* Danger red background */
+  color: var(--danger-color); /* Turns neon pink/red */
+  border-color: rgba(255, 51, 102, 0.3);
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
 }
 
 /* --- SETTINGS BODY LAYOUT --- */
 .settings-body {
   display: flex;
   flex: 1;
-  overflow: hidden; /* Handle scrolling inside children */
+  overflow: hidden;
 }
 
+/* Settings Navigation Sidebar */
 .settings-sidebar {
-  width: 220px;
-  border-right: 1px solid var(--border-color);
-  padding: 16px 12px;
+  width: 240px; /* Wider for better text fit */
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background-color: #1a1a1c; /* Slightly darker than content area */
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.3); 
 }
 
 .settings-sidebar button {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
   color: var(--text-secondary);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   text-align: left;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  letter-spacing: 0.5px;
 }
 
 .settings-sidebar button:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
 }
 
+/* Active Tab Styling */
 .settings-sidebar button.active {
-  background-color: rgba(168, 199, 250, 0.1); /* Soft blue highlight */
-  color: var(--text-accent);
-  font-weight: 600;
+  background-color: rgba(0, 240, 255, 0.05); 
+  color: var(--accent-color); /* Electric cyan text */
+  border-left: 3px solid var(--accent-color); /* Glowing left border */
+  border-right: 1px solid rgba(0, 240, 255, 0.1);
+  border-top: 1px solid rgba(0, 240, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  box-shadow: inset 15px 0 15px -15px rgba(0, 240, 255, 0.2);
 }
 
 .settings-content {
   flex: 1;
-  padding: 24px 32px;
+  padding: 32px 40px;
   overflow-y: auto;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-primary); /* Dark space background */
 }
 /* =========================================================
-   PHASE 3, PART 8: SETTINGS CONTENT (Memory Bank)
+   PART 9: SETTINGS CONTENT (Memory Bank)
    ========================================================= */
 
 /* --- COMMON SECTION HEADERS --- */
 .memory-section h3,
 .tracker-section h3 {
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); /* Subtle cyan text glow */
 }
 
 .memory-section .desc,
 .tracker-section .desc {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
+  line-height: 1.6;
 }
 
 /* --- MEMORY BANK INPUT --- */
 .memory-input-group {
   display: flex;
-  gap: 12px;
-  margin-bottom: 32px;
+  gap: 16px;
+  margin-bottom: 40px;
 }
 
 .memory-input-group input {
   flex: 1;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
+  padding: 14px 20px;
+  border-radius: 8px; /* Techy sharp corners */
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); /* Inner shadow for depth */
 }
 
+/* Glowing focus state for typing */
 .memory-input-group input:focus {
   outline: none;
-  border-color: var(--text-accent);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .memory-input-group button {
-  background-color: var(--text-accent);
-  color: #000;
+  background-color: var(--accent-color); /* Bright Cyan */
+  color: var(--bg-primary); /* Dark text for contrast */
   border: none;
-  padding: 0 20px;
+  padding: 0 24px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .memory-input-group button:hover {
-  background-color: #8ab4f8; /* Slightly darker blue */
+  background-color: #33ffff;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+  transform: scale(1.02);
 }
 
 /* --- MEMORY CARDS --- */
 .memory-lists {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 36px;
 }
 
 .memory-lists h4 {
   font-size: 1.1rem;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  font-weight: 500;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .memory-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--bg-secondary);
-  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 18px 20px;
   border-radius: 8px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
 }
 
+/* Cards light up with a purple glow when hovered */
 .memory-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(-3px);
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(176, 38, 255, 0.4); 
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5), 0 0 15px rgba(176, 38, 255, 0.1);
 }
 
+/* Pinned memories get a special Neon Gold treatment */
 .memory-card.pinned {
-  border-left: 4px solid #fbbc04; /* Yellow accent for pinned */
-  background-color: rgba(251, 188, 4, 0.05);
+  border-left: 4px solid #ffaa00; 
+  background-color: rgba(255, 170, 0, 0.05);
+  border-top: 1px solid rgba(255, 170, 0, 0.1);
+  border-right: 1px solid rgba(255, 170, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 170, 0, 0.1);
 }
 
 .memory-card span {
   color: var(--text-primary);
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.5;
   flex: 1;
-  padding-right: 16px;
+  padding-right: 20px;
 }
 
 .memory-card .actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .memory-card .actions button {
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-secondary);
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .memory-card .actions button:hover {
-  background-color: var(--bg-hover);
-  color: var(--text-primary);
+  background-color: rgba(0, 240, 255, 0.1);
+  color: var(--accent-color); /* Cyan action text */
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
 .empty-text {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-style: italic;
+  opacity: 0.7;
 }
 /* =========================================================
-   PHASE 3, PART 9: TRACKER, TOOLS & RESPONSIVE DESIGN
+   PART 10: TRACKER, EXAM HALL & RESPONSIVE DESIGN
    ========================================================= */
 
 /* --- SYLLABUS TRACKER PROGRESS BARS --- */
 .unit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
 }
 
 .unit-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px; /* Techy sharp corners */
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .unit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(-4px);
+  border-color: rgba(0, 240, 255, 0.3); /* Cyan border on hover */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+/* Subtle glowing line at the top of each card */
+.unit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gradient-primary); /* Cyan to Purple gradient */
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.unit-card:hover::before {
+  opacity: 1;
 }
 
 .unit-card h4 {
   color: var(--text-primary);
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
+/* Background of the progress bar */
 .progress-bar-bg {
   width: 100%;
   height: 8px;
-  background-color: var(--bg-hover);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 
+/* The actual neon green fill */
 .progress-bar-fill {
   height: 100%;
-  background-color: var(--success-color); /* Bright green fill */
+  background-color: var(--success-color); /* Bright Emerald */
   border-radius: 4px;
-  transition: width 0.4s ease-out;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px var(--success-color); /* Neon glow on the progress */
 }
 
 .pct-text {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--accent-color); /* Cyan text for percentage */
+  font-size: 0.95rem;
   text-align: right;
-  font-weight: 500;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
 /* --- TOOLS / EXAM HALL CONTENT --- */
 .tools-content {
   flex: 1;
-  padding: 24px;
+  padding: 32px 40px;
   overflow-y: auto;
   background-color: var(--bg-primary);
+}
+
+/* Styling for the Exam Paper Text we fixed in React */
+.formatted-paper strong {
+  color: var(--accent-alt); /* Purple for bold headings */
+  font-size: 1.1em;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 5px rgba(176, 38, 255, 0.2); /* Slight purple glow */
+}
+
+.formatted-paper p {
+  color: var(--text-primary);
+  font-size: 1.05rem;
 }
 
 /* --- RESPONSIVE DESIGN (MOBILE FIXES) --- */
 @media (max-width: 768px) {
   .main-content.sidebar-open {
-    width: 100vw; /* Sidebar overlays content on mobile */
+    width: 100vw; 
   }
   
   .sidebar.open {
     position: absolute;
     z-index: 500;
-    box-shadow: 4px 0 16px rgba(0,0,0,0.5);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8);
   }
   
   .empty-state {
@@ -1090,11 +1336,11 @@ body {
   }
   
   .greeting-text {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
   
   .sub-greeting {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
   }
   
   .settings-modal,
@@ -1107,10 +1353,11 @@ body {
     flex-direction: column;
   }
   
+  /* Make settings sidebar a horizontal scrollable row on mobile */
   .settings-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     flex-direction: row;
     overflow-x: auto;
     padding: 12px;
@@ -1118,6 +1365,13 @@ body {
   
   .settings-sidebar button {
     white-space: nowrap;
+    border-left: none !important; /* Remove side borders on mobile */
+    border-bottom: 3px solid transparent; /* Prepare for bottom border */
+  }
+
+  .settings-sidebar button.active {
+    border-bottom: 3px solid var(--accent-color); /* Bottom border glow for mobile tabs */
+    box-shadow: none; /* Remove the side inner shadow */
   }
   
   .bottom-controls-wrapper {

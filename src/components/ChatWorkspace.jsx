@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-// import './ChatWorkspace.css'; // We will style this in Phase 3
 
 const ChatWorkspace = ({ messages, status, isEngineReady }) => {
   const messagesEndRef = useRef(null);
@@ -18,12 +17,13 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
       {/* Main Chat Area */}
       <div className="chat-container">
         {messages.length === 0 ? (
-          // Empty State (Gemini Style Greeting)
+          // 1. BRANDING FIX: Replaced Gemini greeting with Study-Lens Pro premium greeting
           <div className="empty-state">
+            <div className="premium-logo-placeholder">🎯</div>
             <h2 className="greeting-text">
-              <span className="gradient-text">Hello, Student.</span>
+              <span className="premium-text">Welcome to Study-Lens Pro.</span>
             </h2>
-            <p className="sub-greeting">How can I help you study today?</p>
+            <p className="sub-greeting">Your hybrid AI study environment is ready. Upload materials or ask a question to begin.</p>
           </div>
         ) : (
           // Chat Bubbles
@@ -33,11 +33,11 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
                 key={index} 
                 className={`message-wrapper ${msg.role === 'user' ? 'user-message' : 'ai-message'}`}
               >
-                {/* AI Avatar Icon */}
+                {/* 2. ICON FIX: Changed the AI Avatar to a "Lens/Eye" design */}
                 {msg.role === 'bot' && (
-                  <div className="ai-avatar">
+                  <div className="ai-avatar premium-avatar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                      <path d="M12 4C7 4 2.73 7.11 1 12c1.73 4.89 6 8 11 8s9.27-3.11 11-8c-1.73-4.89-6-8-11-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
                     </svg>
                   </div>
                 )}
@@ -51,16 +51,16 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
           </div>
         )}
         
-        {/* Status Indicator (Loading / Thinking) */}
+        {/* 3. STATUS FIX: Updated to listen for our new Hybrid Engine status text! */}
         {!isEngineReady ? (
           <div className="engine-status loading">
             <span className="status-dot"></span>
             <span>{status}</span>
           </div>
-        ) : status === "Thinking... 🤔" ? (
+        ) : status.includes("Thinking") ? ( // Now checks if the word "Thinking" is anywhere in the string!
           <div className="engine-status thinking">
             <span className="status-pulse"></span>
-            <span>Thinking...</span>
+            <span>{status}</span>
           </div>
         ) : null}
       </div>
