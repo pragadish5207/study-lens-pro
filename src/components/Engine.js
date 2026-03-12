@@ -8,6 +8,35 @@
 
 let offlineBrainInstance = null; // This holds the local model in memory
 
+// --- DYNAMIC MODEL DISCOVERY (Future-Proofing) ---
+// Auto-discovers the newest, fastest Gemini model available on Google's servers
+async function getBestAvailableModel(apiKey) {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const data = await response.json();
+    
+    // Filter to find models that can generate text AND are built for speed ("flash")
+    const availableModels = data.models.filter(m => 
+      m.supportedGenerationMethods && 
+      m.supportedGenerationMethods.includes('generateContent') && 
+      m.name.includes('flash')
+    );
+    
+    // Grab the newest one from the list
+    if (availableModels.length > 0) {
+      const bestModel = availableModels[availableModels.length - 1].name;
+      console.log("Auto-selected model for Study-Lens Pro:", bestModel);
+      return bestModel; 
+    }
+    
+    // Fallback just in case the fetch fails
+    return "models/gemini-2.5-flash"; 
+  } catch (error) {
+    console.error("Failed to fetch model list, using fallback.", error);
+    return "models/gemini-2.5-flash";
+  }
+}
+
 // --- OFFLINE INITIALIZATION ---
 // This handles downloading the heavy AI model into your browser's local cache.
 export const initEngine = async (progressCallback) => {
@@ -30,6 +59,7 @@ export const initEngine = async (progressCallback) => {
     progressCallback({ progress: currentProgress });
   }, 400); 
 };
+
 // --- HYBRID AI INFERENCE LOGIC ---
 // This function checks if we are in Online or Offline mode and routes the question.
 export const getAIResponse = async (userInput, modeInstructions, studyContext, isOnlineMode) => {
@@ -47,7 +77,11 @@ export const getAIResponse = async (userInput, modeInstructions, studyContext, i
       return "⚠️ API Key is missing! Please make sure VITE_API_KEY is set in Vercel.";
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 1. Dynamically find the best model name first
+    const bestModelName = await getBestAvailableModel(apiKey);
+
+    // 2. Inject that exact name dynamically into the URL
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/${bestModelName}:generateContent?key=${apiKey}`;
     
     // We combine your instructions, the PDF/Image context, and the question.
     const fullPrompt = `${modeInstructions}\n\nStudy Context Data:\n${studyContext}\n\nStudent's Question:\n${userInput}`;
