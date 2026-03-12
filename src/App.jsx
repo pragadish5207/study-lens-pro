@@ -39,7 +39,9 @@ function App() {
 
   // --- HISTORY STATE (BUG FIX: Clean History) ---
   // Changed from the hardcoded array to an empty array [] so it starts fresh.
-  const [chatHistory, setChatHistory] = useState([]); 
+  const [chatHistory, setChatHistory] = useState([
+    { id: 1, title: 'New Study Session', messages: [] }
+  ]);
   const [currentChatId, setCurrentChatId] = useState(1);
 
   // --- SETTINGS STATE ---
@@ -50,6 +52,20 @@ function App() {
 
   // --- MOCK PAPER STATE ---
   const [mockPaper, setMockPaper] = useState(null);
+  // --- AUTO-SAVE CHAT HISTORY & AUTO-NAMING ---
+  useEffect(() => {
+    setChatHistory(prev => prev.map(chat => {
+      if (chat.id === currentChatId) {
+        // Auto-generate title from your first message if it's a new session!
+        let newTitle = chat.title;
+        if (messages.length > 0 && chat.title === 'New Study Session') {
+          newTitle = messages[0].text.substring(0, 22) + '...';
+        }
+        return { ...chat, messages: messages, title: newTitle };
+      }
+      return chat;
+    }));
+  }, [messages, currentChatId]);
 
   // --- INITIALIZE AI ENGINE (BUG FIX: Loading Text) ---
   useEffect(() => {
@@ -79,16 +95,23 @@ function App() {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   
   const handleNewChat = () => {
-    const newId = chatHistory.length + 1;
-    setChatHistory([{ id: newId, title: 'New Study Session' }, ...chatHistory]);
+    const newId = Date.now(); // Creates a unique ID
+    setChatHistory([{ id: newId, title: 'New Study Session', messages: [] }, ...chatHistory]);
     setCurrentChatId(newId);
     setMessages([]); // Clear chat for new session
     setFiles([]); // Clear context
   };
 
   const handleSelectChat = (id) => {
-    setCurrentChatId(id);
-    // Future update: load messages specific to this session ID
+    // 1. Find the saved chat in our history
+    const targetChat = chatHistory.find(c => c.id === id);
+    
+    // 2. If it exists, load its messages back to the screen!
+    if (targetChat) {
+      setCurrentChatId(id);
+      setMessages(targetChat.messages || []); 
+      setFiles([]); // Clear any pending uploads so they don't leak into old chats
+    }
   };
 
   // --- FILE UPLOAD HANDLER ---
@@ -130,10 +153,18 @@ function App() {
     
     // Dynamic mode injection
     let modeInstructions = UNIVERSAL_INSTRUCTIONS;
-    if (studyMode === 'exam') modeInstructions += "\n- EXAM MODE: Focus heavily on high-weightage topics and past paper patterns.";
-    if (studyMode === 'revision') modeInstructions += "\n- REVISION MODE: Provide very short, 1-page summaries and bullet points.";
-    if (studyMode === 'cheat') modeInstructions += "\n- CHEAT MODE: Give direct, easy-to-understand answers with scoring tips.";
-
+    
+    if (studyMode === 'exam') {
+      modeInstructions += "\n- EXAM MODE: Exams are near! Focus heavily on high-weightage topics. Always prefer easy-to-learn but high-scoring topics. Explain every concept in an easy-to-understand way, like you are teaching a fresher. Do not use complex jargon.";
+    }
+    
+    if (studyMode === 'revision') {
+      modeInstructions += "\n- REVISION MODE: STRICT FORMATTING REQUIRED. You MUST use bullet points. Provide ONLY very short, 1-page summaries. Absolutely NO long paragraphs. Keep it incredibly brief and highly structured.";
+    }
+    
+    if (studyMode === 'cheat') {
+      modeInstructions += "\n- CHEAT MODE: Give direct, no-nonsense answers with scoring tips. Prefer practical sums over heavy theory. If teaching a practical method, provide 3 types of practice sums (easy, medium, and hard). Give ONE sum at a time and wait for the user to solve it before moving to the next.";
+    }
     try {
       // 3. NEW FEATURE: Pass `isOnlineMode` to the AI Engine.
       // Now the engine knows whether to use your fast API key or the heavy local model.

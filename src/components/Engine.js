@@ -87,8 +87,19 @@ export const getAIResponse = async (userInput, modeInstructions, studyContext, i
     // 2. Inject that exact name dynamically into the URL
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/${bestModelName}:generateContent?key=${apiKey}`;
     
-    // We combine your instructions, the PDF/Image context, and the question.
-    const fullPrompt = `${modeInstructions}\n\nStudy Context Data:\n${studyContext}\n\nStudent's Question:\n${userInput}`;
+    const fullPrompt = `
+🚨 STRICT SYSTEM DIRECTIVE 🚨
+You are an advanced AI tutor. You MUST format your response EXACTLY according to the active mode rules below. If the mode requires bullet points, short answers, or a specific teaching style, YOU MUST OBEY IT. Do not output a standard paragraph if the mode asks for something else!
+
+[ACTIVE MODE RULES]:
+${modeInstructions}
+
+[CONTEXT MATERIALS]:
+${studyContext ? studyContext : "No uploaded documents."}
+
+[STUDENT'S QUESTION]:
+${userInput}
+`;
 
     try {
       const response = await fetch(apiUrl, {

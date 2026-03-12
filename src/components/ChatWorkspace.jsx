@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react';
 const ChatWorkspace = ({ messages, status, isEngineReady }) => {
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to the bottom when a new message appears
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -12,12 +11,20 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
     scrollToBottom();
   }, [messages]);
 
+  // 👈 THE NEW TRANSLATOR: Converts **text** to bold and \n to line breaks!
+  const formatText = (text) => {
+    if (!text) return null;
+    let htmlText = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--accent-alt); text-shadow: 0 0 5px rgba(176, 38, 255, 0.2);">$1</strong>') // Makes it bold and glowing purple!
+      .replace(/\n/g, '<br />'); // Fixes the spacing so it isn't one giant paragraph
+      
+    return <span dangerouslySetInnerHTML={{ __html: htmlText }} />;
+  };
+
   return (
     <div className="chat-workspace">
-      {/* Main Chat Area */}
       <div className="chat-container">
         {messages.length === 0 ? (
-          // 1. BRANDING FIX: Replaced Gemini greeting with Study-Lens Pro premium greeting
           <div className="empty-state">
             <div className="premium-logo-placeholder">🎯</div>
             <h2 className="greeting-text">
@@ -26,14 +33,12 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
             <p className="sub-greeting">Your hybrid AI study environment is ready. Upload materials or ask a question to begin.</p>
           </div>
         ) : (
-          // Chat Bubbles
           <div className="messages-list">
             {messages.map((msg, index) => (
               <div 
                 key={index} 
                 className={`message-wrapper ${msg.role === 'user' ? 'user-message' : 'ai-message'}`}
               >
-                {/* 2. ICON FIX: Changed the AI Avatar to a "Lens/Eye" design */}
                 {msg.role === 'bot' && (
                   <div className="ai-avatar premium-avatar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -41,23 +46,22 @@ const ChatWorkspace = ({ messages, status, isEngineReady }) => {
                     </svg>
                   </div>
                 )}
+                {/* 👈 USING THE TRANSLATOR HERE */}
                 <div className="message-content">
-                  {msg.text}
+                  {msg.role === 'bot' ? formatText(msg.text) : msg.text}
                 </div>
               </div>
             ))}
-            {/* Invisible div to help us scroll to the bottom */}
             <div ref={messagesEndRef} />
           </div>
         )}
         
-        {/* 3. STATUS FIX: Updated to listen for our new Hybrid Engine status text! */}
         {!isEngineReady ? (
           <div className="engine-status loading">
             <span className="status-dot"></span>
             <span>{status}</span>
           </div>
-        ) : status.includes("Thinking") ? ( // Now checks if the word "Thinking" is anywhere in the string!
+        ) : status.includes("Thinking") ? ( 
           <div className="engine-status thinking">
             <span className="status-pulse"></span>
             <span>{status}</span>
