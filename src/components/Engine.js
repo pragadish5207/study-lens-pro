@@ -16,10 +16,14 @@ async function getBestAvailableModel(apiKey) {
     const data = await response.json();
     
     // Filter to find models that can generate text AND are built for speed ("flash")
+    // Filter to find models that can generate text, are built for speed ("flash"),
+    // AND explicitly block specialized image/preview models that have zero free quota.
     const availableModels = data.models.filter(m => 
       m.supportedGenerationMethods && 
       m.supportedGenerationMethods.includes('generateContent') && 
-      m.name.includes('flash')
+      m.name.includes('flash') &&
+      !m.name.includes('image') && // 👈 THIS BLOCKS THE IMAGE MODEL
+      !m.name.includes('vision')   // 👈 THIS BLOCKS OLD VISION MODELS
     );
     
     // Grab the newest one from the list
