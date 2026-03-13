@@ -8,6 +8,9 @@ import BottomControls from './components/BottomControls';
 import SettingsDashboard from './components/SettingsDashboard';
 import ExamHall from './components/ExamHall';
 import './App.css';
+// --- PWA REGISTRATION ---
+import { registerSW } from 'virtual:pwa-register';
+registerSW({ immediate: true });
 
 // Universal AI Tutor Instructions
 const UNIVERSAL_INSTRUCTIONS = `
