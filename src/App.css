@@ -1378,3 +1378,43 @@ input:checked + .slider:before {
     padding: 0 10px 10px 10px;
   }
 }
+/* =========================================================
+   PRINT STYLES (Fix for Exam Hall Printing)
+   ========================================================= */
+@media print {
+  /* Hide the main app, sidebar, and background */
+  .main-content, .sidebar, header, .bottom-controls-wrapper {
+    display: none !important;
+  }
+
+  /* Force the overlay and modal to fill the page with a white background */
+  .tools-overlay {
+    position: absolute;
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  .tools-modal {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    height: auto !important;
+    background: white !important;
+  }
+
+  /* Hide the header and buttons inside the modal so they don't print */
+  .tools-header, .print-button-class, button {
+    display: none !important;
+  }
+
+  /* Force all text inside the exam paper to be black for the printer */
+  .tools-content {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .formatted-paper * {
+    color: black !important;
+    text-shadow: none !important;
+  }
+}

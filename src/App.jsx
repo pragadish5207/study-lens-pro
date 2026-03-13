@@ -113,6 +113,26 @@ function App() {
       setFiles([]); // Clear any pending uploads so they don't leak into old chats
     }
   };
+  // --- NEW ADVANCED HISTORY CONTROLS ---
+  const handleRenameChat = (id, newTitle) => {
+    setChatHistory(prev => prev.map(chat => 
+      chat.id === id ? { ...chat, title: newTitle } : chat
+    ));
+  };
+
+  const handlePinChat = (id) => {
+    setChatHistory(prev => prev.map(chat => 
+      chat.id === id ? { ...chat, pinned: !chat.pinned } : chat
+    ));
+  };
+
+  const handleDeleteChat = (id) => {
+    setChatHistory(prev => prev.filter(chat => chat.id !== id));
+    // If they delete the chat they are currently looking at, start a new one automatically
+    if (currentChatId === id) {
+      handleNewChat();
+    }
+  };
 
   // --- FILE UPLOAD HANDLER ---
   const handleFileUpload = async (e) => {
@@ -193,6 +213,9 @@ function App() {
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onRenameChat={handleRenameChat}
+        onPinChat={handlePinChat}
+        onDeleteChat={handleDeleteChat}
       />
 
       {/* --- MAIN WORKSPACE AREA --- */}

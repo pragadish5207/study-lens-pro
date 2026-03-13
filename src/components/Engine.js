@@ -1,5 +1,5 @@
 // src/components/Engine.js
-
+import { CreateMLCEngine } from "@mlc-ai/web-llm";
 // =================================================================
 // THE HYBRID AI ENGINE (ONLINE API + OFFLINE LOCAL)
 // =================================================================
@@ -43,25 +43,32 @@ async function getBestAvailableModel(apiKey) {
 
 // --- OFFLINE INITIALIZATION ---
 // This handles downloading the heavy AI model into your browser's local cache.
+// --- TRUE OFFLINE INITIALIZATION (WebLLM & WebGPU) ---
+// This downloads a real 1GB+ AI model into your browser's IndexedDB cache.
+// It only downloads fully the first time! After that, it loads from cache.
+
+const SELECTED_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC"; 
+
 export const initEngine = async (progressCallback) => {
-  console.log("Initializing Local Offline AI Engine...");
+  console.log("Initializing True Local Offline AI Engine...");
   
-  let currentProgress = 0;
-  
-  const downloadSimulation = setInterval(() => {
-    // Simulating downloading model chunks into browser storage
-    currentProgress += 0.08; 
-    
-    if (currentProgress >= 1) {
-      currentProgress = 1;
-      clearInterval(downloadSimulation);
-      offlineBrainInstance = "LOCAL_MODEL_READY"; // Brain is stored in RAM
-      console.log("Offline AI Brain successfully loaded into browser memory!");
-    }
-    
-    // Updates the UI loading bar
-    progressCallback({ progress: currentProgress });
-  }, 400); 
+  try {
+    offlineBrainInstance = await CreateMLCEngine(
+      SELECTED_MODEL,
+      {
+        initProgressCallback: (progressData) => {
+          console.log(progressData.text); // Logs the actual download MBs in the console!
+          // WebLLM provides progress from 0.0 to 1.0, which perfectly matches our UI!
+          progressCallback({ progress: progressData.progress });
+        }
+      }
+    );
+    console.log("True Offline AI Brain successfully loaded into GPU memory!");
+  } catch (error) {
+    console.error("Failed to load the local AI model. Your device might not support WebGPU.", error);
+    // Fallback so the UI doesn't freeze forever if their hardware fails
+    progressCallback({ progress: 1 }); 
+  }
 };
 
 // --- HYBRID AI INFERENCE LOGIC ---
@@ -126,20 +133,34 @@ ${userInput}
   } 
   
   // ==========================================
-  // 🧠 DEEP OFFLINE MODE (Local Processing)
+  // 🧠 TRUE DEEP OFFLINE MODE (Local WebLLM)
   // ==========================================
   else {
-    console.log("Routing to Deep Offline Local Engine...");
+    console.log("Routing to True Deep Offline Local Engine...");
     
-    if (!offlineBrainInstance) {
-      throw new Error("Offline brain is not fully downloaded yet!");
+    // Check if the engine is actually loaded and isn't just our old placeholder string
+    if (!offlineBrainInstance || typeof offlineBrainInstance === 'string') {
+      return "⚠️ Offline brain is still downloading or hasn't been initialized yet. Please wait for the loading bar to finish!";
     }
 
-    // This simulates the actual hardware processing time of a local model
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`[OFFLINE MODE] Processed completely locally on your device! 🔒\n\nI have read your context and applied the rules to answer: "${userInput}"\n\n(Zero internet was used to generate this response. Your study data is 100% private.)`);
-      }, 1800);
-    });
+    try {
+      // WebLLM uses a standard message format (System + User)
+      const systemPrompt = `You are a helpful AI tutor.\n\nRULES:\n${modeInstructions}\n\nCONTEXT:\n${studyContext}`;
+      
+      const reply = await offlineBrainInstance.chat.completions.create({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userInput }
+        ],
+        temperature: 0.7, // Balances creativity and accuracy
+      });
+
+      // We add a little tag so you know it's the real local model working!
+      return "🔒 [TRUE OFFLINE] " + reply.choices[0].message.content;
+      
+    } catch (error) {
+      console.error("Local AI generation failed:", error);
+      return "⚠️ Sorry, your device ran out of memory trying to run the local AI, or the model failed to load.";
+    }
   }
 };
